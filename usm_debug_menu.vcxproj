@@ -31,6 +31,12 @@
     <ClInclude Include="animation_controller.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="base_ai_core.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="base_ai_debug.h" />
+  </ItemGroup>
+  <ItemGroup>
     <ClInclude Include="bit.h" />
   </ItemGroup>
   <ItemGroup>
@@ -53,6 +59,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="entity.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="entity_base.h" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="entity_base_vhandle.h" />
@@ -97,6 +106,9 @@
     <ClInclude Include="igofrontend.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="info_node.h" />
+  </ItemGroup>
+  <ItemGroup>
     <ClInclude Include="input_mgr.h" />
   </ItemGroup>
   <ItemGroup>
@@ -126,11 +138,20 @@
   <ItemGroup>
     <ClInclude Include="mstring.h" />
   </ItemGroup>
+    <ItemGroup>
+    <ClInclude Include="mvector.h" />
+  </ItemGroup>
   <ItemGroup>
     <ClInclude Include="nal_system.h" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="os_developer_options.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="os_file.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="param_block.h" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="region.h" />

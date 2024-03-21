@@ -65,10 +65,10 @@ void populate_entity_animation_menu(debug_menu_entry *entry)
         {
             auto *v23 = (actor *) ent;
 
-            auto  v22 = actor::get_animations(v23);
+            auto v22 = actor::get_animations(v23);
             if ( !v22.empty() )
             {
-                auto &id = bit_cast<entity *>(v23)->get_id();
+                auto id = v23->get_id();
                 debug_menu_entry v21 {mString {id.to_string()}};
 
                 v21.set_game_flags_handler(sub_6918AD);

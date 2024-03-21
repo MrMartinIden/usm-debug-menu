@@ -49,13 +49,15 @@ if(USE_GLM)
 endif()
 
 
-add_library(binkw32 SHARED main.cpp forwards.h)
-    
-target_compile_options(binkw32
-  PRIVATE
-    ${flags}
-  )
+file(GLOB SRC "./src/*.cpp" "./src/*.h")
+add_library(binkw32 SHARED main.cpp ${SRC})
 
+target_compile_options(binkw32
+    PRIVATE
+    ${flags}
+)
+
+target_include_directories(binkw32 PUBLIC src)
 
 target_link_directories(binkw32 PRIVATE ${CMAKE_FIND_ROOT_PATH}/include)
 target_link_directories(binkw32 PRIVATE ${CMAKE_FIND_ROOT_PATH}/lib)

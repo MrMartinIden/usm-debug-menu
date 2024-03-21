@@ -1,24 +1,8 @@
-#pragma once
+#include "animation_controller.h"
 
-#include "float.hpp"
+#include "bit.h"
 
-struct animation_controller {
-    struct anim_ctrl_handle {
-        int field_0;
-        int field_4;
-        struct {
-            int m_vtbl;
-        } * field_8;
-
-        void set_anim_speed(Float a2);
-    };
-
-    anim_ctrl_handle play_base_layer_anim(
-            const string_hash &a3,
-            Float a4,
-            uint32_t a5,
-            bool a6);
-};
+#include <cstdio>
 
 animation_controller::anim_ctrl_handle animation_controller::play_base_layer_anim(
         const string_hash &a3,

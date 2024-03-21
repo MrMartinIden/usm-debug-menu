@@ -1,31 +1,34 @@
 #pragma once
 
+#include "signaller.h"
+
 #include "common.h"
 #include "string_hash.h"
 #include "vtbl.h"
+#include "variable.h"
 #include "vector3d.h"
 
 #include "list.hpp"
 
+struct collision_geometry;
 struct region;
 struct po;
+struct time_interface;
 
-struct entity
+template<typename T, uint32_t N>
+struct fixed_vector;
+
+struct entity : signaller 
 {
-    int m_vtbl;
-    int field_4;
-    int field_8;
-    int field_C;
-    string_hash field_10;
-    int field_14;
-    int field_18;
-    struct {
-        int field_0;
-    } my_handle;
+    static constexpr inline auto FIXED_REGIONS_ARRAY_SIZE = 2;
 
-    auto &get_id() const {
-        return this->field_10;
-    }
+    region *regions[FIXED_REGIONS_ARRAY_SIZE];
+    fixed_vector<region *, 7> *extended_regions;
+    collision_geometry *colgeom;
+    time_interface *field_58;
+    int field_5C;
+    int field_60;
+    int field_64;
 
     void suspend(bool a1) {
         auto &func = get_vfunc(m_vtbl, 0x1B8);
@@ -71,4 +74,5 @@ struct entity
     static inline Var<_std::list<entity *> *> found_entities {0x0095A6E0};
 };
 
+VALIDATE_SIZE(entity, 0x68u);
 VALIDATE_OFFSET(entity, my_handle, 0x1C);

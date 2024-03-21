@@ -17,6 +17,7 @@
 #pragma comment(lib, "Dinput8.lib")
 #pragma comment(lib, "Dxguid.lib")
 
+#include "base_ai_debug.h"
 #include "devopt.h"
 #include "entity_animation_menu.h"
 #include "game.h"
@@ -1916,6 +1917,7 @@ void debug_menu::init() {
 	add_debug_menu_entry(root_menu, &level_select_entry);
 
     create_debug_render_menu(root_menu);
+    create_ai_root_menu(root_menu);
     create_memory_menu(root_menu);
     create_entity_animation_menu(root_menu);
 

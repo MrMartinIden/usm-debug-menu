@@ -2,6 +2,8 @@
 
 #include <cstring>
 
+#include <type_traits>
+
 template<class To, class From>
 constexpr
     typename std::enable_if_t<sizeof(To) == sizeof(From) && std::is_trivially_copyable_v<From> &&

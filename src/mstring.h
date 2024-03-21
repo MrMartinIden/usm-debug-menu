@@ -2,6 +2,9 @@
 
 #include "func_wrapper.h"
 
+#include <cstdarg>
+#include <cstdio>
+
 struct mString
 {
     int field_0;
@@ -62,6 +65,9 @@ struct mString
         return (*this);
     }
 
+    int length() const {
+        return this->m_size;
+    }
 
     void update_guts(const char* a2, signed int a3) {
 
