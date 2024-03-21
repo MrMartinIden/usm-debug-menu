@@ -32,3 +32,8 @@ void *func_address(Func func) {
 
     return result;
 }
+
+template<typename T0, typename T1>
+decltype(auto) CAST([[maybe_unused]] const T0 &var, T1 address) {
+    return bit_cast<T0>(address);
+}

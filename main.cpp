@@ -396,7 +396,7 @@ void render_current_debug_menu() {
 	render_height += 12;
 	int render_x = menu_x_start;
 	render_x += 8;
-	nglListAddString(*nglSysFont, render_x, render_height, 0.2f, green_color, 1.f, 1.f, current_menu->title);
+	nglListAddString(nglSysFont(), render_x, render_height, 0.2f, green_color, 1.f, 1.f, current_menu->title);
 	render_height += getStringHeight(current_menu->title);
 
 	if (current_menu->window_start) {
@@ -1320,8 +1320,8 @@ void set_nop(ptrdiff_t address, size_t num_bytes) {
     }
 }
 
-void install_patches() {
-
+void install_patches()
+{
 
     //fix invalid float operation
     {

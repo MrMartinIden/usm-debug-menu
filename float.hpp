@@ -8,4 +8,8 @@ struct Float
 
     Float(float v) : value(v) {}
 
+    operator float() const {
+        return value;
+    }
+
 };

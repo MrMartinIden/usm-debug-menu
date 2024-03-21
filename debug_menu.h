@@ -91,7 +91,7 @@ struct debug_menu_entry {
 
     void on_change(float a3, bool a4)
     {
-        printf("on_change\n");
+        printf("debug_menu_entry::on_change: text = %s, entry_type = %s, a5 = %d\n", this->text, to_string(this->entry_type), a4);
 
         switch ( this->entry_type )
         {
@@ -245,13 +245,17 @@ struct debug_menu_entry {
 
     int set_ival(int a2, bool a3)
     {
+        printf("debug_menu_entry::set_ival: a2 = %d\n", a2);
+
         if ( !this->is_value_initialized() )
         {
-            if ( (float)a2 > this->field_20[1] )
+            if ( (float)a2 > this->field_20[1] ) {
                 a2 = (int)this->field_20[1];
+            }
 
-            if ( this->field_20[0] > (float)a2 )
+            if ( this->field_20[0] > (float)a2 ) {
                 a2 = (int)this->field_20[0];
+            }
 
             auto v4 = this->entry_type;
             if ( v4 == INTEGER )
