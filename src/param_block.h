@@ -90,7 +90,7 @@ struct param_block {
             return this->m_union.ent;
         }
 
-        mString sub_6761D4()
+        mString get_value_in_string_form()
         {
             mString result {};
             switch ( this->my_type )

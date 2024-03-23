@@ -46,7 +46,7 @@ void handle_export_block(debug_menu_entry *arg0)
 
         for ( auto &v28 : v31->field_0 )
         {
-            auto v21 = v28->sub_6761D4();
+            auto v21 = v28->get_value_in_string_form();
             auto v19 = v28->field_8;
 
             auto v15 = v21.c_str();
