@@ -27,7 +27,6 @@ enum debug_menu_entry_type {
 
 extern const char *to_string(debug_menu_entry_type entry_type);
 
-
 enum custom_key_type {
 	LEFT,
 	RIGHT,
@@ -40,29 +39,46 @@ extern void entry_frame_advance_callback_default(debug_menu_entry *a1);
 
 struct debug_menu;
 
-std::string entry_render_callback_default(debug_menu_entry* entry);
+extern std::string entry_render_callback_default(debug_menu_entry* entry);
+
+struct script_instance;
 
 struct debug_menu_entry {
 	char text[MAX_CHARS];
 	debug_menu_entry_type entry_type;
-	void* data;
+    union {
+        float fval;
+        float *p_fval;
+        bool bval;
+        bool *p_bval;
+        int ival;
+        int *p_ival;
+        debug_menu *p_menu;
+    } m_value;
 	void* data1;
     uint16_t m_id {0};
     std::string (*render_callback)(debug_menu_entry *) = entry_render_callback_default;
     void (*m_game_flags_handler)(debug_menu_entry *) = nullptr;
     void (*frame_advance_callback)(debug_menu_entry *) = entry_frame_advance_callback_default;
-    float field_20[4] = {0.f, 1.f, 0.1f, 10.f};
+    script_instance *field_14;
+    int field_18;
+    struct {
+        float m_min_value;
+        float m_max_value;
+        float m_step_size;
+        float m_step_scale;
+    } field_20 {0.f, 1.f, 0.1f, 10.f};
     bool m_value_initialized {false};
     void *m_data = nullptr;
 
     void set_step_size(float a2)
     {
-        this->field_20[2] = a2;
+        this->field_20.m_step_size = a2;
     }
 
     void set_step_scale(float a2)
     {
-        this->field_20[3] = a2;
+        this->field_20.m_step_scale = a2;
     }
 
     void set_data(void *a2)
@@ -99,89 +115,34 @@ struct debug_menu_entry {
 
     void on_select(float a2);
 
+    bool set_script_handler(script_instance *inst, const mString &a3);
+
     debug_menu *remove_menu();
 
-    void on_change(float a3, bool a4)
-    {
-        printf("debug_menu_entry::on_change: text = %s, entry_type = %s, a5 = %d\n", this->text, to_string(this->entry_type), a4);
-
-        switch ( this->entry_type )
-        {
-        case FLOAT_E:
-        case POINTER_FLOAT:
-        {
-            float v6;
-            if ( a4 )
-            {
-                v6 = this->field_20[2] * this->field_20[3];
-            }
-            else
-            {
-                v6 = this->field_20[2];
-            }
-
-            auto v5 = this->get_fval() + a3 * v6;
-            this->set_fval(v5, true);
-            break;
-        }
-        case BOOLEAN_E:
-        case POINTER_BOOL:
-        {
-            auto v3 = this->get_bval();
-            this->set_bval(!v3, true);
-            break;
-        }
-        case INTEGER:
-        case POINTER_INT:
-        {
-            float v7 = (a4 ? this->field_20[2] * this->field_20[3] : this->field_20[2]);
-
-            printf("%f\n", v7);
-            auto v8 = std::abs(v7);
-            if ( v8 < 1.0 )
-            {
-                v8 = 1.0;
-            }
-
-            auto v4 = this->get_ival();
-            if ( a3 >= 0.0 )
-            {
-                this->set_ival((int)(v4 + v8), true);
-            }
-            else
-            {
-                this->set_ival((int)(v4 - v8), true);
-            }
-
-            break;
-        }
-        default:
-        return;
-        }
-    }
+    void on_change(float a3, bool a4);
 
     void set_fval(float a2, bool a3)
     {
         if ( !this->is_value_initialized() )
         {
-            if ( a2 > this->field_20[1] )
+            if ( a2 > this->field_20.m_max_value )
             {
-                a2 = this->field_20[1];
+                a2 = this->field_20.m_max_value;
             }
 
-            if ( this->field_20[0] > a2 )
+            if ( this->field_20.m_min_value > a2 )
             {
-                a2 = this->field_20[0];
+                a2 = this->field_20.m_min_value;
             }
 
             auto v3 = this->entry_type;
             if ( v3 == FLOAT_E )
             {
-                this->data = bit_cast<void *>(a2);
+                this->m_value.fval = a2;
             }
             else if ( v3 == POINTER_FLOAT )
             {
-                *(float *)this->data = a2;
+                *this->m_value.p_fval = a2;
             }
             else
             {
@@ -197,14 +158,15 @@ struct debug_menu_entry {
         this->get_fval();
     }
 
-    float get_fval() {
+    float get_fval()
+    {
         auto v2 = this->entry_type;
         if (v2 == FLOAT_E) {
-            return bit_cast<float>(this->data);
+            return this->m_value.fval;
         }
 
         if (v2 == POINTER_FLOAT) {
-            return *(float *) this->data;
+            return *this->m_value.p_fval;
         }
 
         assert(0);
@@ -216,12 +178,12 @@ struct debug_menu_entry {
         auto v2 = this->entry_type;
         if ( v2 == BOOLEAN_E )
         {
-            return (bool) this->data;
+            return this->m_value.bval;
         }
 
         if ( v2 == POINTER_BOOL )
         {
-            return *(bool *) this->data;
+            return *this->m_value.p_bval;
         }
 
         assert(0);
@@ -233,12 +195,12 @@ struct debug_menu_entry {
         auto v2 = this->entry_type;
         if ( v2 == INTEGER )
         {
-            return (int) this->data;
+            return this->m_value.ival;
         }
 
         if ( v2 == POINTER_INT )
         {
-            return *(int*) this->data;
+            return *this->m_value.p_ival;
         }
 
         assert(0);
@@ -261,22 +223,22 @@ struct debug_menu_entry {
 
         if ( !this->is_value_initialized() )
         {
-            if ( (float)a2 > this->field_20[1] ) {
-                a2 = (int)this->field_20[1];
+            if ( a2 > this->field_20.m_max_value ) {
+                a2 = this->field_20.m_max_value;
             }
 
-            if ( this->field_20[0] > (float)a2 ) {
-                a2 = (int)this->field_20[0];
+            if ( this->field_20.m_min_value > a2 ) {
+                a2 = this->field_20.m_min_value;
             }
 
             auto v4 = this->entry_type;
             if ( v4 == INTEGER )
             {
-                this->data = (void *) a2;
+                this->m_value.ival = a2;
             }
             else if ( v4 == POINTER_INT )
             {
-                *((int *) this->data) = a2;
+                *this->m_value.p_ival = a2;
             }
             else
             {
@@ -295,29 +257,29 @@ struct debug_menu_entry {
     void set_p_ival(int *a2)
     {
         this->entry_type = POINTER_INT;
-        this->data = (void *) a2;
+        this->m_value.p_ival= a2;
     }
 
     void set_pt_fval(float *a2)
     {
         this->entry_type = POINTER_FLOAT;
-        this->data = bit_cast<void *>(a2);
+        this->m_value.p_fval = a2;
     }
 
     void set_min_value(float a2)
     {
-        this->field_20[0] = a2;
+        this->field_20.m_min_value = a2;
     }
 
     void set_max_value(float a2)
     {
-        this->field_20[1] = a2;
+        this->field_20.m_max_value = a2;
     }
 
     void set_bval(bool a2)
     {
         this->entry_type = BOOLEAN_E;
-        this->data = (void *) a2;
+        this->m_value.bval = a2;
     }
 
     bool set_bval(bool a2, bool a3)
@@ -327,11 +289,11 @@ struct debug_menu_entry {
             auto v4 = this->entry_type;
             if ( v4 == BOOLEAN_E )
             {
-                this->data = (void *) a2;
+                this->m_value.bval = a2;
             }
             else if ( v4 == POINTER_BOOL )
             {
-                * ((BOOL *) this->data) = a2;
+                *this->m_value.p_bval = a2;
             }
             else
             {
@@ -350,22 +312,22 @@ struct debug_menu_entry {
     void set_pt_bval(bool *a2)
     {
         this->entry_type = POINTER_BOOL;
-        this->data = a2;
+        this->m_value.p_bval = a2;
     }
 
     void set_ival(int a2)
     {
         this->entry_type = INTEGER;
-        this->data = (void *) a2;
+        this->m_value.ival= a2;
     }
 
     void set_fl_values(const float *a2)
     {
-        auto *v2 = this->field_20;
-        v2[0] = a2[0];
-        v2[1] = a2[1];
-        v2[2] = a2[2];
-        v2[3] = a2[3];
+        auto &v2 = this->field_20;
+        v2.m_min_value = a2[0];
+        v2.m_max_value = a2[1];
+        v2.m_step_size = a2[2];
+        v2.m_step_scale = a2[3];
     }
 
     void set_game_flags_handler(void (*a2)(debug_menu_entry *))
@@ -380,8 +342,9 @@ struct debug_menu_entry {
 
     debug_menu_entry() = default;
 
-    debug_menu_entry(const char *p_text) : entry_type(UNDEFINED), data(nullptr)
+    debug_menu_entry(const char *p_text) : entry_type(UNDEFINED)
     {
+        m_value.p_ival = nullptr;
         strncpy(this->text, p_text, MAX_CHARS_SAFE);
     }
 
@@ -391,19 +354,11 @@ struct debug_menu_entry {
     }
 
     debug_menu_entry(debug_menu *submenu);
-
-    debug_menu_entry(const char *p_text, debug_menu_entry_type p_type, void *p_data) :
-        entry_type(p_type), data(p_data)
-    {
-        strncpy(this->text, p_text, MAX_CHARS_SAFE);
-    }
 };
-
-extern std::string entry_render_callback_default(debug_menu_entry* entry);
 
 typedef void (*menu_handler_function)(debug_menu_entry*, custom_key_type key_type);
 
-void close_debug();
+extern void close_debug();
 
 extern debug_menu* current_menu;
 

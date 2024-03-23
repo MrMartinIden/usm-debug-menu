@@ -1,6 +1,10 @@
 #include "debug_menu.h"
 
 #include "mstring.h"
+#include "script_instance.h"
+#include "script_object.h"
+#include "string_hash.h"
+#include "vm_executable.h"
 
 #include <algorithm>
 #include <cassert>
@@ -75,20 +79,131 @@ void close_debug();
 
 debug_menu* current_menu = nullptr;
 
+void script_handler_helper(debug_menu_entry *a2)
+{
+    if ( a2->field_18 >= 0 && a2->field_14 != nullptr )
+    {
+        auto *parent = a2->field_14->get_parent();
+        auto *exe = parent->get_func(a2->field_18);
+        assert(exe != nullptr);
+
+        if ( exe->get_parms_stacksize() == 4 ) {
+            a2->field_14->add_thread(exe, (const char *)&a2);
+        } else {
+            a2->field_14->add_thread(exe);
+        }
+
+        debug_menu::hide();
+    }
+}
+
+bool debug_menu_entry::set_script_handler(script_instance *inst, const mString &a3)
+{
+    auto *v14 = this;
+
+    assert(inst != nullptr);
+
+    auto *v3 = a3.c_str();
+    string_hash v8 {v3};
+
+    auto *v5 = inst->get_parent();
+    auto v9 = v5->find_func(v8);
+    auto v13 = v9;
+
+    bool result;
+    if ( v9 >= 0 )
+    {
+        v14->field_14 = inst;
+        v14->field_18 = v13;
+        v14->m_game_flags_handler = script_handler_helper;
+        result = true;
+    }
+    else
+    {
+        auto *v6 = a3.c_str();
+        printf("Could not find handler: %s\n", v6);
+        result = false;
+    }
+
+    return result;
+}
+
 debug_menu *debug_menu_entry::remove_menu()
 {
     if ( this->m_game_flags_handler != nullptr )
     {
-        if ( this->data != nullptr )
+        if ( this->m_value.p_menu != nullptr )
         {
-            static_cast<debug_menu *>(this->data)->~debug_menu();
+            this->m_value.p_menu->~debug_menu();
         }
 
-        this->data = nullptr;
+        this->m_value.p_menu = nullptr;
         this->m_game_flags_handler(this);
     }
 
-    return (debug_menu *) this->data;
+    return this->m_value.p_menu;
+}
+
+void debug_menu_entry::on_change(float a3, bool a4)
+{
+    printf("debug_menu_entry::on_change: text = %s, entry_type = %s, a5 = %d\n", this->text, to_string(this->entry_type), a4);
+
+    switch ( this->entry_type )
+    {
+    case FLOAT_E:
+    case POINTER_FLOAT:
+    {
+        float v6;
+        if ( a4 )
+        {
+            v6 = this->field_20.m_step_size * this->field_20.m_step_scale;
+        }
+        else
+        {
+            v6 = this->field_20.m_step_size;
+        }
+
+        auto v5 = this->get_fval() + a3 * v6;
+        this->set_fval(v5, true);
+        break;
+    }
+    case BOOLEAN_E:
+    case POINTER_BOOL:
+    {
+        auto v3 = this->get_bval();
+        this->set_bval(!v3, true);
+        break;
+    }
+    case INTEGER:
+    case POINTER_INT:
+    {
+        float v7 = (a4
+                    ? this->field_20.m_step_size * this->field_20.m_step_scale
+                    : this->field_20.m_step_size
+                    );
+
+        printf("%f\n", v7);
+        auto v8 = std::abs(v7);
+        if ( v8 < 1.0 )
+        {
+            v8 = 1.0;
+        }
+
+        auto v4 = this->get_ival();
+        if ( a3 >= 0.0 )
+        {
+            this->set_ival((int)(v4 + v8), true);
+        }
+        else
+        {
+            this->set_ival((int)(v4 - v8), true);
+        }
+
+        break;
+    }
+    default:
+    return;
+    }
 }
 
 void debug_menu_entry::on_select(float a2)
@@ -110,9 +225,9 @@ void debug_menu_entry::on_select(float a2)
         break;
     case POINTER_MENU:
         this->remove_menu();
-        if ( this->data != nullptr )
+        if ( this->m_value.p_menu != nullptr )
         {
-            current_menu = static_cast<debug_menu *>(this->data);
+            current_menu = this->m_value.p_menu;
         }
 
         break;
@@ -124,15 +239,16 @@ void debug_menu_entry::on_select(float a2)
 void debug_menu_entry::set_submenu(debug_menu *submenu)
 {
     this->entry_type = POINTER_MENU;
-    this->data = submenu;
+    this->m_value.p_menu = submenu;
 
     if (submenu != nullptr) {
         submenu->m_parent = current_menu;
     }
 }
 
-debug_menu_entry::debug_menu_entry(debug_menu *submenu) : entry_type(POINTER_MENU), data(submenu)
+debug_menu_entry::debug_menu_entry(debug_menu *submenu) : entry_type(POINTER_MENU)
 {
+    m_value.p_menu = submenu;
     strncpy(this->text, submenu->title, MAX_CHARS_SAFE);
 }
 
@@ -140,7 +256,7 @@ void* add_debug_menu_entry(debug_menu* menu, debug_menu_entry* entry)
 {
     if (entry->entry_type == POINTER_MENU)
     {
-        auto *submenu = static_cast<debug_menu *>(entry->data);
+        auto *submenu = entry->m_value.p_menu;
         if (submenu != nullptr) {
             submenu->m_parent = menu;
         }
@@ -297,9 +413,9 @@ void handle_game_entry(debug_menu_entry *entry, custom_key_type key_type)
         } 
         case POINTER_MENU:
         {
-            if (entry->data != nullptr)
+            if (entry->m_value.p_menu != nullptr)
             {
-                current_menu = static_cast<decltype(current_menu)>(entry->data);
+                current_menu = entry->m_value.p_menu;
             }
             return;
         }

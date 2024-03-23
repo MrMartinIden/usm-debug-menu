@@ -21,18 +21,19 @@ struct variance_variable {
 
 namespace ai {
 
-struct param_block {
+enum param_types {
+    PT_FLOAT = 0,
+    PT_INTEGER = 1,
+    PT_STRING_HASH = 2,
+    PT_FIXED_STRING = 3,
+    PT_VECTOR_3D = 4,
+    PT_FLOAT_VARIANCE = 5,
+    PT_ENTITY = 6,
+    PT_POINTER = 7,
+};
 
-    enum param_data_type {
-        PT_FLOAT = 0,
-        PT_INTEGER = 1,
-        PT_STRING_HASH = 2,
-        PT_FIXED_STRING = 3,
-        PT_VECTOR_3D = 4,
-        PT_FLOAT_VARIANCE = 5,
-        PT_ENTITY = 6,
-        PT_POINTER = 7,
-    };
+
+struct param_block {
 
     struct param_data {
         union U {
@@ -44,10 +45,10 @@ struct param_block {
             variance_variable<float> *float_variance;
             entity_base_vhandle *ent;
         } m_union;
-        param_data_type my_type;
+        param_types my_type;
         string_hash field_8;
 
-        param_data_type get_data_type() const {
+        auto get_data_type() const {
             return this->my_type;
         }
 

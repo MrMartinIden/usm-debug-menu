@@ -2,6 +2,7 @@
 
 #include <cstdint>
 
+#include "common.h"
 #include "fixedstring32.h"
 
 namespace MemoryUnitManager

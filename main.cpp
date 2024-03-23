@@ -18,6 +18,7 @@
 #pragma comment(lib, "Dxguid.lib")
 
 #include "base_ai_debug.h"
+#include "debug_menu_extra.h"
 #include "devopt.h"
 #include "entity_animation_menu.h"
 #include "game.h"
@@ -37,12 +38,13 @@
 #include "os_developer_options.h"
 #include "script_executable.h"
 #include "script_library_class.h"
+#include "script_instance.h"
 #include "script_object.h"
 #include "spider_monkey.h"
 #include "geometry_manager.h"
 #include "entity.h"
 #include "terrain.h"
-#include "debug_menu_extra.h"
+#include "vm_executable.h"
 
 DWORD* ai_current_player = nullptr;
 DWORD* fancy_player_ptr = nullptr;
@@ -119,7 +121,6 @@ static constexpr DWORD MAX_ELEMENTS_PAGE = 18;
 
 debug_menu* game_menu = nullptr;
 debug_menu* missions_menu = nullptr;
-debug_menu* options_menu = nullptr;
 debug_menu* script_menu = nullptr;
 debug_menu* progression_menu = nullptr;
 debug_menu* level_select_menu = nullptr;
@@ -128,7 +129,6 @@ debug_menu** all_menus[] = {
 	&debug_menu::root_menu,
     &game_menu,
 	&missions_menu,
-	&options_menu,
 	&script_menu,
 	&progression_menu,
     &level_select_menu
@@ -478,29 +478,11 @@ typedef DWORD* (__fastcall* ai_ai_core_get_info_node_ptr)(DWORD* , void* edx, in
 ai_ai_core_get_info_node_ptr ai_ai_core_get_info_node = (ai_ai_core_get_info_node_ptr) 0x006A3390;
 
 
-struct vm_executable;
-
-typedef struct {
-	uint8_t unk[0x2C];
-	script_object* object;
-} script_instance;
-
-
-struct vm_executable {
-	struct {
-        DWORD unk;
-        script_executable *scriptexecutable;
-    } *unk_struct;
-	DWORD field_4;
-	string_hash field_8;
-	DWORD params;
-};
-
-typedef struct {
+struct vm_thread {
 	uint8_t unk[0xC];
-	script_instance* instance;
-	vm_executable* vmexecutable;
-} vm_thread;
+	script_instance *inst;
+	vm_executable *ex;
+};
 
 struct vm_stack {
 	uint8_t unk[0x184];
@@ -525,17 +507,15 @@ uint8_t __stdcall slf__debug_menu_entry__set_handler__str(vm_stack *stack, void*
 
 	void** params = (void**)stack->stack_ptr;
 
-	debug_menu_entry* entry = static_cast<decltype(entry)>(params[0]);
-	char* scrpttext = static_cast<char *>(params[1]);
+	debug_menu_entry *entry = static_cast<decltype(entry)>(params[0]);
+	const char *scrpttext = static_cast<char *>(params[1]);
 
 	string_hash strhash {scrpttext};
 
-	script_instance* instance = stack->thread->instance;
-	int functionid = instance->object->find_func(strhash);
-	entry->data = instance;
-	entry->data1 = (void *) functionid;
+	script_instance *instance = stack->thread->inst;
+    entry->set_script_handler(instance, mString {scrpttext});
 	
-	return 1;
+	return true;
 }
 
 uint8_t __stdcall slf__destroy_debug_menu_entry__debug_menu_entry(vm_stack* function, void* unk) {
@@ -548,8 +528,6 @@ uint8_t __stdcall slf__destroy_debug_menu_entry__debug_menu_entry(vm_stack* func
 
 	return 1;
 }
-
-void handle_progression_select_entry(debug_menu_entry* entry);
 
 void sub_65BB36(script_library_class::function *func, vm_stack *stack, char *a3, int a4)
 {
@@ -578,32 +556,22 @@ uint8_t __fastcall slf__create_progression_menu_entry(script_library_class::func
 
 	printf("Entry: %s -> %s\n", strs[0], strs[1]);
 
-
 	string_hash strhash {strs[1]};
 
-	script_instance* instance = stack->thread->instance;
-	int functionid = instance->object->find_func(strhash);
+	script_instance *instance = stack->thread->inst;
 
-	debug_menu_entry entry {};
-	entry.entry_type = UNDEFINED;
-	entry.data = instance;
-	entry.data1 = (void *) functionid;
+	debug_menu_entry entry {strs[0]};
+    entry.set_script_handler(instance, {strs[1]});
 
-	strcpy(entry.text, strs[0]);
-    entry.set_game_flags_handler(handle_progression_select_entry);
-
-	add_debug_menu_entry(progression_menu, &entry);
-
-	/*
-	if(function->thread->instance->object->vmexecutable[functionid]->params != 4)
-	*/
+	progression_menu->add_entry(&entry);
 	
 	int push = 0;
 	stack->push(&push, sizeof(push));
 	return true;
 }
 
-bool __fastcall slf__create_debug_menu_entry(script_library_class::function *func, void *, vm_stack* stack, void* unk) {
+bool __fastcall slf__create_debug_menu_entry(script_library_class::function *func, void *, vm_stack* stack, void* unk)
+{
 	stack->pop(4);
 
     auto *stack_ptr = bit_cast<char *>(stack->stack_ptr);
@@ -618,19 +586,19 @@ bool __fastcall slf__create_debug_menu_entry(script_library_class::function *fun
 
     printf("entry.text = %s\n", entry.text);
 
-	script_instance* instance = stack->thread->instance;
-    printf("Total funcs: %d\n", instance->object->total_funcs);
+	script_instance *instance = stack->thread->inst;
+    printf("Total funcs: %d\n", instance->m_parent->total_funcs);
 
 	void *res = add_debug_menu_entry(script_menu, &entry);
 
-	script_executable* se = stack->thread->vmexecutable->unk_struct->scriptexecutable;
+	script_executable *se = stack->thread->ex->owner->parent;
     printf("total_script_objects = %d\n", se->total_script_objects);
     for (auto i = 0; i < se->total_script_objects; ++i) {
         auto *so = se->field_28[i];
-        printf("Name of script_object = %s\n", so->field_0.to_string());
+        printf("Name of script_object = %s\n", so->name.to_string());
 
         for (auto i = 0; i < so->total_funcs; ++i) {
-            printf("Func name: %s\n", so->funcs[i]->field_8.to_string());
+            printf("Func name: %s\n", so->funcs[i]->name.to_string());
         }
 
         printf("\n");
@@ -977,23 +945,6 @@ void menu_setup(int game_state, int keyboard) {
         {
             create_level_select_menu(level_select_menu);
         }
-
-		if (options_menu->used_slots == 2) {
-			BYTE* arr = (BYTE *) *(DWORD*)0x96858C;
-			debug_menu_entry render_fe = { "Render FE UI ", POINTER_BOOL, &arr[4 + 0x90] };
-			add_debug_menu_entry(options_menu, &render_fe);
-
-
-			BYTE* flags = *(BYTE**)0x0096858C;
-			debug_menu_entry live_in_glass_house = { "Live in Glass House ", POINTER_BOOL,  &flags[4 + 0x7A] };
-			add_debug_menu_entry(options_menu, &live_in_glass_house);
-
-
-			debug_menu_entry god_mode_entry = { "God Mode ", INTEGER, (void *) 0 };
-            god_mode_entry.m_id = 5;
-
-            add_debug_menu_entry(options_menu, &god_mode_entry);
-		}
 	}
 }
 
@@ -1031,18 +982,11 @@ void menu_input_handler(int keyboard, int SCROLL_SPEED) {
 	}
 	else if (is_menu_key_pressed(MENU_LEFT, keyboard) || is_menu_key_pressed(MENU_RIGHT, keyboard)) {
 
-		debug_menu_entry* cur = &current_menu->entries[current_menu->window_start + current_menu->cur_index];
-		if (cur->entry_type == POINTER_BOOL ||
-                cur->entry_type == POINTER_INT ||
-                cur->entry_type == INTEGER
-                ) {
-			//current_menu->handler(cur, (is_menu_key_pressed(MENU_LEFT, keyboard) ? LEFT : RIGHT));
-
-            if (is_menu_key_pressed(MENU_LEFT, keyboard)) {
-                cur->on_change(-1.0, false);
-            } else {
-                cur->on_change(1.0, true);
-            }
+		debug_menu_entry *cur = &current_menu->entries[current_menu->window_start + current_menu->cur_index];
+        if (is_menu_key_pressed(MENU_LEFT, keyboard)) {
+            cur->on_change(-1.0, false);
+        } else {
+            cur->on_change(1.0, true);
         }
 	}
 
@@ -1403,7 +1347,7 @@ void close_debug() {
 }
 
 void handle_debug_entry(debug_menu_entry* entry, custom_key_type) {
-	current_menu = static_cast<decltype(current_menu)>(entry->data);
+	current_menu = entry->m_value.p_menu;
 }
 
 typedef bool (__fastcall *entity_tracker_manager_get_the_arrow_target_pos_ptr)(void *, void *, vector3d *);
@@ -1412,52 +1356,6 @@ entity_tracker_manager_get_the_arrow_target_pos_ptr entity_tracker_manager_get_t
 void set_god_mode(int a1)
 {
     CDECL_CALL(0x004BC040, a1);
-}
-
-void handle_options_select_entry(debug_menu_entry* entry, custom_key_type key_type) {
-
-    if (entry->m_id == 5)
-    {
-        auto val = (int) entry->data;
-        if (key_type == LEFT)
-        {
-            --val;
-        }
-        else if (key_type == RIGHT)
-        {
-            ++val;
-        }
-
-        val = std::clamp(val, 0, 5);
-
-        entry->data = (void *) val;
-
-        set_god_mode(val);
-
-        return;
-    }
-
-	BYTE* val = (BYTE *) entry->data;
-	*val = !*val;
-}
-
-typedef void* (__fastcall* script_instance_add_thread_ptr)(script_instance* , void* edx, vm_executable* a1, void* a2);
-script_instance_add_thread_ptr script_instance_add_thread = (script_instance_add_thread_ptr) 0x005AAD00;
-
-void handle_progression_select_entry(debug_menu_entry* entry) {
-
-	script_instance* instance = static_cast<script_instance *>(entry->data);
-	int functionid = (int) entry->data1;
-
-	DWORD addr = (DWORD) entry;
-
-	script_instance_add_thread(instance, nullptr, instance->object->funcs[functionid], &addr);
-
-	close_debug();
-}
-
-void handle_script_select_entry(debug_menu_entry* entry) {
-	handle_progression_select_entry(entry);
 }
 
 void create_devopt_menu(debug_menu *parent)
@@ -1893,14 +1791,12 @@ void debug_menu::init() {
 	root_menu = create_menu("Debug Menu", handle_debug_entry, 10);
 	game_menu = create_menu("Game", handle_game_entry, 300);
 	missions_menu = create_menu("Missions");
-	options_menu = create_menu("Options", handle_options_select_entry, 2);
-	script_menu = create_menu("Script", (menu_handler_function) handle_script_select_entry, 50);
+	script_menu = create_menu("Script");
 	progression_menu = create_menu("Progression");
     level_select_menu = create_menu("Level Select");
 
 	debug_menu_entry game_entry { game_menu };
 	debug_menu_entry missions_entry { missions_menu };
-	debug_menu_entry options_entry { options_menu };
 	debug_menu_entry script_entry { script_menu };
 	debug_menu_entry progression_entry { progression_menu };
 	debug_menu_entry level_select_entry { level_select_menu };
@@ -1911,7 +1807,6 @@ void debug_menu::init() {
 
     create_debug_district_variants_menu(root_menu);
 
-	add_debug_menu_entry(root_menu, &options_entry);
 	add_debug_menu_entry(root_menu, &script_entry);
 	add_debug_menu_entry(root_menu, &progression_entry);
 	add_debug_menu_entry(root_menu, &level_select_entry);
@@ -1920,12 +1815,6 @@ void debug_menu::init() {
     create_ai_root_menu(root_menu);
     create_memory_menu(root_menu);
     create_entity_animation_menu(root_menu);
-
-	debug_menu_entry show_fps = { "Show FPS", POINTER_BOOL, (void *) 0x975848 };
-	debug_menu_entry memory_info = { "Memory Info", POINTER_BOOL, (void *) 0x975849 };
-	
-	add_debug_menu_entry(options_menu, &show_fps);
-	add_debug_menu_entry(options_menu, &memory_info);
 
 	/*
 	for (int i = 0; i < 5; i++) {

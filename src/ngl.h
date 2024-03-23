@@ -1,15 +1,21 @@
 #pragma once
 
+#include "femanager.h"
+#include "fixedstring.h"
 #include "float.hpp"
 #include "func_wrapper.h"
 #include "hashstring.h"
+#include "igofrontend.h"
 #include "matrix4x4.h"
 #include "ngl_math.h"
+#include "po.h"
 #include "utility.h"
 #include "tl_system.h"
 #include "trace.h"
 #include "variables.h"
+#include "vector3d.h"
 #include "vector4d.h"
+#include "vtbl.h"
 
 #include <psapi.h>
 #include <windows.h>

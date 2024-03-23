@@ -71,6 +71,8 @@ void handle_export_block(debug_menu_entry *arg0)
 
 std::string ai_param_render_callback(debug_menu_entry *a2)
 {
+    using namespace ai;
+
     mString result {};
 
     auto *the_data = static_cast<ai::param_block::param_data *>(a2->get_data());
@@ -78,7 +80,7 @@ std::string ai_param_render_callback(debug_menu_entry *a2)
 
     switch ( the_data->get_data_type() )
     {
-    case ai::param_block::param_data_type::PT_STRING_HASH: {
+    case PT_STRING_HASH: {
         auto v19 = the_data->get_data_hash();
         auto v18 = the_data->field_8;
         auto *v15 = v19.to_string();
@@ -86,14 +88,14 @@ std::string ai_param_render_callback(debug_menu_entry *a2)
         result = mString {0, "%s %s (hash)", v2, v15};
         break;
     }
-    case ai::param_block::param_data_type::PT_FIXED_STRING: {
+    case PT_FIXED_STRING: {
         auto v20 = the_data->field_8;
         auto *v16 = the_data->get_data_string();
         auto v4 = v20.to_string();
         result = mString {0, "%s %s (fixedstring)", v4, v16};
         break;
     }
-    case ai::param_block::param_data_type::PT_VECTOR_3D: {
+    case PT_VECTOR_3D: {
         vector3d v32 = *the_data->get_data_vector3d();
         auto v21 = the_data->field_8;
         auto v13 = v32[2];
@@ -103,7 +105,7 @@ std::string ai_param_render_callback(debug_menu_entry *a2)
         result = mString {0, "%s (%.2f %.2f %.2f) (vector3d)", v6, v10, v11, v13};
         break;
     }
-    case ai::param_block::param_data_type::PT_FLOAT_VARIANCE: {
+    case PT_FLOAT_VARIANCE: {
         auto v31 = *the_data->get_data_float_variance();
         auto v22 = the_data->field_8;
         auto v14 = v31.field_4;
@@ -127,6 +129,8 @@ std::string ai_param_render_callback(debug_menu_entry *a2)
 
 void populate_param_block(debug_menu_entry *a2)
 {
+    using namespace ai;
+
     auto *the_pb = static_cast<ai::param_block *>(a2->get_data());
     assert(the_pb != nullptr);
 
@@ -148,8 +152,8 @@ void populate_param_block(debug_menu_entry *a2)
 
             switch ( v22->get_data_type() )
             {
-            case ai::param_block::param_data_type::PT_FLOAT: {
-                auto *v3 = &v22->get_data_float();
+            case PT_FLOAT: {
+                auto *v3 = bit_cast<float *>(v22);
                 
                 v27.set_pt_fval(v3);
                 v27.set_step_size(0.30000001);
@@ -158,18 +162,18 @@ void populate_param_block(debug_menu_entry *a2)
                 v27.set_min_value(-3.4028235e38);
                 break;
             }
-            case ai::param_block::param_data_type::PT_INTEGER: {
-                auto *v4 = &v22->get_data_int();
+            case PT_INTEGER: {
+                auto *v4 = bit_cast<int *>(v22);
                 
                 v27.set_p_ival(v4);
                 v27.set_max_value(2147483600.0);
                 v27.set_min_value(-2147483600.0);
                 break;
             }
-            case ai::param_block::param_data_type::PT_STRING_HASH:
-            case ai::param_block::param_data_type::PT_FIXED_STRING:
-            case ai::param_block::param_data_type::PT_VECTOR_3D:
-            case ai::param_block::param_data_type::PT_FLOAT_VARIANCE:
+            case PT_STRING_HASH:
+            case PT_FIXED_STRING:
+            case PT_VECTOR_3D:
+            case PT_FLOAT_VARIANCE:
                 v27.set_render_cb(ai_param_render_callback);
                 break;
             default:

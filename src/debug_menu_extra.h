@@ -2,7 +2,10 @@
 
 #include "debug_menu.h"
 #include "entity_tracker_manager.h"
+#include "game.h"
 #include "game_settings.h"
+#include "terrain.h"
+#include "wds.h"
 
 void district_variants_handler(debug_menu_entry *entry)
 {

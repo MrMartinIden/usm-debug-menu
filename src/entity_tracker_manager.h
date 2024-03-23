@@ -2,6 +2,8 @@
 
 #include "bit.h"
 
+struct vector3d;
+
 struct entity_tracker_manager {
 
     bool get_the_arrow_target_pos(vector3d *a2)
