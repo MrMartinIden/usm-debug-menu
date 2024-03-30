@@ -20,204 +20,95 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="actor.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="ai_player_controller.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="animation_controller.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="base_ai_core.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="base_ai_debug.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="bit.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="color.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="color32.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="common.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="debug_menu.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="debug_menu_extra.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="devopt.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="entity.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="entity_base.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="entity_base_vhandle.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="entity_animation_menu.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="entity_tracker_manager.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="fe_health_widget.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="femanager.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="fixedstring.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="fixedstring32.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="forwards.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="fetext.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="func_wrapper.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="game.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="game_settings.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="geometry_manager.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="igofrontend.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="info_node.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="input_mgr.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="levelmenu.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="list.hpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="mashable_vector.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="memory.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="memory_menu.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="mission_manager.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="mission_manager_script_data.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="mission_table_container.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="mstring.h" />
-  </ItemGroup>
-    <ItemGroup>
-    <ClInclude Include="mvector.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="nal_system.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="os_developer_options.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="os_file.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="param_block.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="region.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="region_mash_info.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="resource_key.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="resource_directory.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="resource_manager.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="resource_pack_directory.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="resource_pack_location.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="resource_pack_slot.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="resource_partition.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="script_executable.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="script_library_class.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="script_memtrack.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="script_object.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="slab_allocator.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="spider_monkey.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="terrain.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="tlresource_location.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="utility.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="variable.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="variables.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="vtbl.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="wds.h" />
+    <ClCompile Include="src\actor.cpp" />
+    <ClCompile Include="src\animation_controller.cpp" />
+    <ClCompile Include="src\base_ai_debug.cpp" />
+    <ClCompile Include="src\debug_menu.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\actor.h" />
+    <ClInclude Include="src\ai_player_controller.h" />
+    <ClInclude Include="src\animation_controller.h" />
+    <ClInclude Include="src\base_ai_core.h" />
+    <ClInclude Include="src\base_ai_debug.h" />
+    <ClInclude Include="src\bit.h" />
+    <ClInclude Include="src\color.h" />
+    <ClInclude Include="src\color32.h" />
+    <ClInclude Include="src\common.h" />
+    <ClInclude Include="src\debug_menu.h" />
+    <ClInclude Include="src\debug_menu_extra.h" />
+    <ClInclude Include="src\devopt.h" />
+    <ClInclude Include="src\entity.h" />
+    <ClInclude Include="src\entity_animation_menu.h" />
+    <ClInclude Include="src\entity_base.h" />
+    <ClInclude Include="src\entity_base_vhandle.h" />
+    <ClInclude Include="src\entity_handle_manager.h" />
+    <ClInclude Include="src\entity_tracker_manager.h" />
+    <ClInclude Include="src\femanager.h" />
+    <ClInclude Include="src\fetext.h" />
+    <ClInclude Include="src\fe_health_widget.h" />
+    <ClInclude Include="src\fixedstring.h" />
+    <ClInclude Include="src\fixedstring32.h" />
+    <ClInclude Include="src\float.hpp" />
+    <ClInclude Include="src\forwards.h" />
+    <ClInclude Include="src\func_wrapper.h" />
+    <ClInclude Include="src\game.h" />
+    <ClInclude Include="src\game_settings.h" />
+    <ClInclude Include="src\geometry_manager.h" />
+    <ClInclude Include="src\hashstring.h" />
+    <ClInclude Include="src\igofrontend.h" />
+    <ClInclude Include="src\info_node.h" />
+    <ClInclude Include="src\input_mgr.h" />
+    <ClInclude Include="src\levelmenu.h" />
+    <ClInclude Include="src\list.hpp" />
+    <ClInclude Include="src\mashable_vector.h" />
+    <ClInclude Include="src\matrix4x4.h" />
+    <ClInclude Include="src\memory.h" />
+    <ClInclude Include="src\memory_menu.h" />
+    <ClInclude Include="src\mission_manager.h" />
+    <ClInclude Include="src\mission_manager_script_data.h" />
+    <ClInclude Include="src\mission_table_container.h" />
+    <ClInclude Include="src\mstring.h" />
+    <ClInclude Include="src\mvector.h" />
+    <ClInclude Include="src\nal_system.h" />
+    <ClInclude Include="src\ngl.h" />
+    <ClInclude Include="src\ngl_math.h" />
+    <ClInclude Include="src\os_developer_options.h" />
+    <ClInclude Include="src\os_file.h" />
+    <ClInclude Include="src\param_block.h" />
+    <ClInclude Include="src\physical_interface.h" />
+    <ClInclude Include="src\po.h" />
+    <ClInclude Include="src\region.h" />
+    <ClInclude Include="src\region_mash_info.h" />
+    <ClInclude Include="src\resource_directory.h" />
+    <ClInclude Include="src\resource_key.h" />
+    <ClInclude Include="src\resource_manager.h" />
+    <ClInclude Include="src\resource_pack_directory.h" />
+    <ClInclude Include="src\resource_pack_location.h" />
+    <ClInclude Include="src\resource_pack_slot.h" />
+    <ClInclude Include="src\resource_partition.h" />
+    <ClInclude Include="src\script_executable.h" />
+    <ClInclude Include="src\script_instance.h" />
+    <ClInclude Include="src\script_library_class.h" />
+    <ClInclude Include="src\script_memtrack.h" />
+    <ClInclude Include="src\script_object.h" />
+    <ClInclude Include="src\signaller.h" />
+    <ClInclude Include="src\slab_allocator.h" />
+    <ClInclude Include="src\spider_monkey.h" />
+    <ClInclude Include="src\string_hash.h" />
+    <ClInclude Include="src\terrain.h" />
+    <ClInclude Include="src\tlresource_location.h" />
+    <ClInclude Include="src\tl_system.h" />
+    <ClInclude Include="src\trace.h" />
+    <ClInclude Include="src\utility.h" />
+    <ClInclude Include="src\variable.h" />
+    <ClInclude Include="src\variables.h" />
+    <ClInclude Include="src\vector2di.h" />
+    <ClInclude Include="src\vector3d.h" />
+    <ClInclude Include="src\vector4d.h" />
+    <ClInclude Include="src\vm_executable.h" />
+    <ClInclude Include="src\vtbl.h" />
+    <ClInclude Include="src\wds.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
@@ -229,26 +120,26 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
@@ -290,6 +181,8 @@
       <ConformanceMode>true</ConformanceMode>
       <ExceptionHandling>false</ExceptionHandling>
       <BufferSecurityCheck>false</BufferSecurityCheck>
+      <AdditionalIncludeDirectories>C:\Projects\usm-debug-menu\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
