@@ -24,6 +24,10 @@
     <ClCompile Include="src\animation_controller.cpp" />
     <ClCompile Include="src\base_ai_debug.cpp" />
     <ClCompile Include="src\debug_menu.cpp" />
+    <ClCompile Include="src\debug_menu_extra.cpp" />
+    <ClCompile Include="src\game.cpp" />
+    <ClCompile Include="src\message_board.cpp" />
+    <ClCompile Include="src\wds.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\actor.h" />
@@ -65,6 +69,7 @@
     <ClInclude Include="src\matrix4x4.h" />
     <ClInclude Include="src\memory.h" />
     <ClInclude Include="src\memory_menu.h" />
+    <ClInclude Include="src\message_board.h" />
     <ClInclude Include="src\mission_manager.h" />
     <ClInclude Include="src\mission_manager_script_data.h" />
     <ClInclude Include="src\mission_table_container.h" />

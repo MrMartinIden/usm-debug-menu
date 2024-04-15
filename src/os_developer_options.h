@@ -86,11 +86,7 @@ struct os_developer_options
         return std::distance(std::begin(int_names()), it);
     }
 
-    static inline Var<const char *[150]> flag_names { 0x00936420 };
-
-    static inline Var<BOOL[150]> flag_defaults{0x00936678};
-
-    int get_flag_from_name(const mString &a1)
+    int get_flag_from_name(const mString &a1) const
     {
         auto func = [&a1](const char *v2) {
             return (_strcmpi(v2, a1.c_str()) == 0);
@@ -112,7 +108,7 @@ struct os_developer_options
         return this->m_flags[a2];
     }
 
-    bool get_flag(const mString &a2)
+    bool get_flag(const mString &a2) const
     {
         if constexpr (1)
         {
@@ -120,7 +116,7 @@ struct os_developer_options
         }
         else
         {
-            bool (__fastcall *func)(void *, void *, const mString *)
+            bool (__fastcall *func)(const void *, void *, const mString *)
                 = bit_cast<decltype(func)>(0x005C2F20);
             return func(this, nullptr, &a2);
         }
