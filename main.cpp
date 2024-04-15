@@ -31,6 +31,7 @@
 #include "fixedstring32.h"
 #include "levelmenu.h"
 #include "memory_menu.h"
+#include "message_board.h"
 #include "mission_manager.h"
 #include "mission_table_container.h"
 #include "mstring.h"
@@ -46,6 +47,7 @@
 #include "entity.h"
 #include "terrain.h"
 #include "vm_executable.h"
+#include "wds.h"
 
 DWORD* ai_current_player = nullptr;
 DWORD* fancy_player_ptr = nullptr;
@@ -1278,6 +1280,12 @@ void install_patches()
 
     REDIRECT(0x005E10EE, init_shadow_targets);
 
+    spider_monkey_patch();
+
+    message_board_patch();
+    
+    wds_patch();
+
     ngl_patch();
 
     game_patch();
@@ -1354,11 +1362,6 @@ void handle_debug_entry(debug_menu_entry* entry, custom_key_type) {
 typedef bool (__fastcall *entity_tracker_manager_get_the_arrow_target_pos_ptr)(void *, void *, vector3d *);
 entity_tracker_manager_get_the_arrow_target_pos_ptr entity_tracker_manager_get_the_arrow_target_pos = (entity_tracker_manager_get_the_arrow_target_pos_ptr) 0x0062EE10;
 
-void set_god_mode(int a1)
-{
-    CDECL_CALL(0x004BC040, a1);
-}
-
 void create_devopt_menu(debug_menu *parent)
 {
     assert(parent != nullptr);
@@ -1402,263 +1405,6 @@ void create_devopt_menu(debug_menu *parent)
 
     auto v5 = debug_menu_entry(v22);
     parent->add_entry(&v5);
-}
-
-namespace spider_monkey {
-    bool is_running()
-    {
-        return (bool) CDECL_CALL(0x004B3B60);
-    }
-}
-
-void game_flags_handler(debug_menu_entry *a1)
-{
-    switch ( a1->get_id() )
-    {
-    case 0u: //Physics Enabled
-    {
-        auto v1 = a1->get_bval();
-        g_game_ptr()->enable_physics(v1);
-        debug_menu::physics_state_on_exit = a1->get_bval();
-        break;
-    }
-    case 1u: //Single Step
-    {
-        g_game_ptr()->flag.single_step = true;
-        break;
-    }
-    case 2u: //Slow Motion Enabled
-    {
-        static int old_frame_lock = 0;
-        int v27;
-        if ( a1->get_bval() )
-        {
-            old_frame_lock = os_developer_options::instance()->get_int(mString{"FRAME_LOCK"});
-            v27 = 120;
-        }
-        else
-        {
-            v27 = old_frame_lock;
-        }
-
-        os_developer_options::instance()->set_int(mString{"FRAME_LOCK"}, v27);
-        debug_menu::hide();
-        break;
-    }
-    case 3u: //Monkey Enabled
-    {
-        if ( a1->get_bval() )
-        {
-            spider_monkey::start();
-            spider_monkey::on_level_load();
-            auto *v2 = input_mgr::instance();
-            auto *rumble_device = v2->rumble_ptr;
-
-            assert(rumble_device != nullptr);
-            rumble_device->disable_vibration();
-        }
-        else
-        {
-            spider_monkey::on_level_unload();
-            spider_monkey::stop();
-        }
-
-        debug_menu::hide();
-        break;
-    }
-    case 4u:
-    {
-        auto *v3 = input_mgr::instance();
-        auto *rumble_device = v3->rumble_ptr;
-        assert(rumble_device != nullptr);
-
-        if ( a1->get_bval() )
-            rumble_device->enable_vibration();
-        else
-            rumble_device->disable_vibration();
-
-        break;
-    }
-    case 5u: //God Mode
-    {
-        auto v4 = a1->get_ival();
-        set_god_mode(v4);
-        debug_menu::hide();
-        break;
-    }
-    case 6u: //Show Districts
-    {
-        debug_menu::hide();
-        os_developer_options::instance()->set_flag(mString{"SHOW_STREAMER_INFO"}, a1->get_bval());
-
-        if ( a1->get_bval() )
-        {
-            os_developer_options::instance()->set_flag(mString{"SHOW_DEBUG_TEXT"}, true);
-        }
-
-        //TODO
-        //sub_66C242(&g_game_ptr->field_4C);
-        break;
-    }
-    case 7u: //Show Hero Position
-    {
-        debug_menu::hide();
-        os_developer_options::instance()->set_flag(mString{"SHOW_DEBUG_INFO"}, a1->get_bval());
-        break;
-    }
-    case 8u:
-    {
-        debug_menu::hide();
-        os_developer_options::instance()->set_flag(mString{"SHOW_FPS"}, a1->get_bval());
-        break;
-    }
-    case 9u:
-    {
-        auto v24 = a1->get_bval();
-        auto *v5 = input_mgr::instance();
-        if ( !v5->field_30[1] )
-        {
-            v24 = false;
-        }
-
-
-        os_developer_options::instance()->set_flag(mString{"USERCAM_ON_CONTROLLER2"}, v24);
-        auto *v6 = input_mgr::instance();
-        auto *v23 = v6->field_30[1];
-
-        //TODO
-        /*
-        if ( !(*(unsigned __int8 (__thiscall **)(int))(*(_DWORD *)v23 + 44))(v23) )
-        {
-            j_debug_print_va("Controller 2 is not connected!");
-            ->set_bval(a1, 0, 1);
-            v24 = 0;
-        }
-        if ( v24 )
-        {
-            j_debug_print_va("User cam (theoretically) enabled on controller 2");
-            v7 = (*(int (__thiscall **)(int))(*(_DWORD *)v23 + 8))(v23);
-            sub_676E45(g_mouselook_controller, v7);
-        }
-        else
-        {
-            sub_676E45(g_mouselook_controller, -1);
-        }
-        */
-
-        auto *v8 = g_world_ptr()->get_hero_ptr(0);
-        if ( v8 != nullptr && g_game_ptr()->field_172 )
-        {
-            if ( a1->get_bval() )
-            {
-                auto *v14 = g_world_ptr()->get_hero_ptr(0);
-                v14->unsuspend(1);
-            }
-            else
-            {
-                auto *v15 = g_world_ptr()->get_hero_ptr(0);
-                v15->suspend(1);
-            }
-        }
-        break;
-    }
-    case 11u: //Hires Screenshot
-    {
-        debug_menu::hide();
-        auto a2 = os_developer_options::instance()->get_int(mString{"HIRES_SCREENSHOT_X"});
-        auto a3 = os_developer_options::instance()->get_int(mString{"HIRES_SCREENSHOT_Y"});
-        assert(a2 != 0 && a3 != 0 && "HIRES_SCREENSHOT_X and HIRES_SCREENSHOT_Y must be not equal 0");
-        g_game_ptr()->begin_hires_screenshot(a2, a3);
-        break;
-    }
-    case 12u: //Lores Screenshot
-    {
-        g_game_ptr()->push_lores();
-        break;
-    }
-    case 13u:
-    {
-        static auto load_districts = TRUE;
-        if ( load_districts )
-        {
-            auto *v11 = g_world_ptr()->the_terrain;
-            v11->unload_all_districts_immediate();
-            resource_manager::set_active_district(false);
-        }
-        else
-        {
-            resource_manager::set_active_district(true);
-        }
-
-        load_districts = !load_districts;
-        debug_menu::hide();
-        break;
-    }
-    case 14u:
-    {
-        //TODO
-        //sub_66FBE0();
-        debug_menu::hide();
-        break;
-    }
-    case 15u:
-    {
-        //sub_697DB1();
-        debug_menu::hide();
-        break;
-    }
-    case 16u:
-    {
-        //TODO
-        //sub_698D33();
-        debug_menu::hide();
-        break;
-    }
-    case 17u:
-    {
-        [[maybe_unused]]auto v12 = a1->get_bval();
-
-        //TODO
-        //sub_6A88A5(g_game_ptr, v12);
-        break;
-    }
-    case 18u:
-    {
-        auto v13 = a1->get_ival();
-        a1->set_ival(v13, 0);
-        auto v16 = a1->get_ival();
-        if ( v16 )
-        {
-            if ( v16 == 1 )
-            {
-                if ( geometry_manager::is_scene_analyzer_enabled() )
-                {
-                    geometry_manager::enable_scene_analyzer(false);
-                }
-
-                g_game_ptr()->field_172 = true;
-
-            }
-            else if ( v16 == 2 )
-            {
-                g_game_ptr()->field_172 = false;
-                geometry_manager::enable_scene_analyzer(true);
-            }
-        }
-        else
-        {
-            if ( geometry_manager::is_scene_analyzer_enabled() )
-            {
-                geometry_manager::enable_scene_analyzer(false);
-            }
-
-            g_game_ptr()->field_172 = false;
-        }
-    break;
-    }
-    default:
-    return;
-    }
 }
 
 void create_game_flags_menu(debug_menu *parent)
@@ -1802,6 +1548,7 @@ void debug_menu::init() {
 	debug_menu_entry progression_entry { progression_menu };
 	debug_menu_entry level_select_entry { level_select_menu };
 
+    create_camera_menu_items(root_menu);
     create_warp_menu(root_menu);
 	add_debug_menu_entry(root_menu, &game_entry);
 	add_debug_menu_entry(root_menu, &missions_entry);

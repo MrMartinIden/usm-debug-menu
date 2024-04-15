@@ -29,6 +29,7 @@ struct game_process
 inline Var<game_process> lores_game_process{0x00922074};
 
 struct game_settings;
+struct message_board;
 
 struct game
 {
@@ -36,7 +37,7 @@ struct game
     entity *field_5C;
     entity *current_game_camera;
     void *field_64;
-    void *field_68;
+    message_board *mb;
     struct {
         int field_0;
         game_process *m_first;
@@ -82,11 +83,23 @@ struct game
         return this->gamefile;
     }
 
+    void enable_user_camera(bool a2) {
+        this->field_172 = a2;
+    }
+
+    bool is_user_camera_enabled() const {
+        return this->field_172;
+    }
+
+    void set_camera(int camera_state);
+
     void enable_physics(bool a2)
     {
         void (__fastcall *func)(void*, int, bool) = (decltype(func)) 0x00515230;
         func(this, 0, a2);
     }
+
+    void message_board_init();
 
     void enable_marky_cam(bool a2, bool a3, Float a4, Float a5)
     {
@@ -134,216 +147,7 @@ struct game
     void frame_advance_level(Float time_inc);
 };
 
-VALIDATE_OFFSET(game, gamefile, 0xC0);
-VALIDATE_OFFSET(game, field_172, 0x172);
-VALIDATE_OFFSET(game, field_280, 0x280);
-
 inline Var<game *> g_game_ptr{0x009682E0};
 
-mString sub_55DD80(const vector3d &a2)
-{
-    mString a1 {0, "<%.3f,%.3f,%.3f>", a2.x, a2.y, a2.z};
-    return a1;
-}
+extern void game_patch();
 
-mString game::get_camera_info()
-{
-    auto *v2 = this->field_5C;
-
-    mString v22;
-    if ( v2->get_primary_region() != nullptr )
-    {
-        auto *v4 = v2->get_primary_region();
-        auto &v5 = v4->get_name();
-        auto *v6 = v5.to_string();
-        v22 = mString{v6};
-    }
-    else
-    {
-        v22 = mString{"none"};
-    }
-
-    mString v33 = v22;
-
-
-    auto &v18 = *v2->get_abs_position();
-    auto *v8 = g_world_ptr()->the_terrain;
-    auto *v32 = v8->find_region(v18, nullptr);
-    if ( v32 != nullptr )
-    {
-        auto &v9 = v32->get_name();
-        auto *v10 = v9.to_string();
-        v33 = {v10};
-    }
-
-    auto &v12 = *v2->get_abs_position();
-    auto v31 = sub_55DD80(v12);
-
-    auto &v14 = *v2->get_abs_po();
-    auto &v15 = v14.get_z_facing();
-
-    auto v30 = sub_55DD80(v15);
-    auto *v20 = v30.c_str();
-    auto *v19 = v31.c_str();
-    auto *v16 = v33.c_str();
-
-    mString v29 {0, "CAMERA @ %s %s, f = %s", v16, v19, v20};
-
-    auto v24 = " " + v33;
-
-    v29 += v24;
-    
-    return v29;
-}
-
-mString game::get_analyzer_info()
-{
-    auto v16 = string_hash("SCENE_ANALYZER_CAM");
-    auto *v3 = entity_handle_manager::find_entity(v16, entity_flavor_t::CAMERA, false);
-
-    auto &v14 = *v3->get_abs_position();
-    auto *v4 = g_world_ptr()->the_terrain;
-    auto *v26 = v4->find_region(v14, nullptr);
-
-    mString v25 {""};
-    if ( v26 != nullptr )
-    {
-        auto &v5 = v26->get_name();
-        auto *v6 = v5.to_string();
-        v25 = v6;
-    }
-
-    auto &v8 = *v3->get_abs_position();
-    auto v24 = sub_55DD80(v8);
-
-    auto &v10 = *v3->get_abs_po();
-    auto &v11 = v10.get_z_facing();
-    auto v23 = sub_55DD80(v11);
-
-    auto *v15 = v23.c_str();
-    auto *v12 = v24.c_str();
-
-    mString a1 {0, "ANALYZER @ %s, f = %s", v12, v15};
-    auto v17 = " " + v25;
-    a1 += v17;
-    return a1;
-}
-
-mString game::get_hero_info()
-{
-    auto *hero_ptr = g_world_ptr()->get_hero_ptr(0);
-    if ( hero_ptr == nullptr )
-    {
-        mString result {"(hero does not exist!)"};
-        return result;
-    }
-
-    region *v29 = nullptr;
-    if ( hero_ptr != nullptr )
-    {
-        v29 = hero_ptr->get_primary_region();
-    }
-
-    mString v28 {"none"};
-    if ( v29 != nullptr )
-    {
-        auto &v4 = v29->get_name();
-        auto *v5 = v4.to_string();
-        v28 = {v5};
-    }
-
-    auto v27 = [&]() -> mString
-    {
-        if ( hero_ptr != nullptr )
-        {
-            auto &v6 = *hero_ptr->get_abs_position();
-            return sub_55DD80(v6);
-        }
-
-        return mString{"N/A"};
-    }();
-
-    vector3d v15;
-    if ( hero_ptr != nullptr )
-    {
-        auto *v7 = bit_cast<actor *>(hero_ptr)->physical_ifc();
-        v15 = v7->get_velocity();
-    }
-    else
-    {
-        v15 = ZEROVEC;
-    }
-
-    mString v25{0, "HERO @ %s ", v28.c_str()};
-
-    auto *v9 = v27.c_str();
-    v25.append(v9, -1);
-    v25.append(", v = ", -1);
-
-    auto v14 = sub_55DD80(v15);
-    v25.append(v14.c_str(), -1);
-
-    return v25;
-}
-
-void game::show_debug_info()
-{
-    auto DEBUG_INFO_FONT_PCT = os_developer_options::instance()->get_int(mString{"DEBUG_INFO_FONT_PCT"});
-    auto v15 = (float)DEBUG_INFO_FONT_PCT / 100.0;
-    auto a1 = this->get_hero_info();
-
-    vector2di v13 {50, 40};
-    auto *v4 = a1.c_str();
-    nglListAddString(nglSysFont(), (float)v13.x, (float)v13.y, 1.0, v15, v15, v4);
-
-    auto v12 = this->get_camera_info();
-    v13.y += 20;
-    auto *v5 = v12.c_str();
-    nglListAddString(nglSysFont(), (float)v13.x, (float)v13.y, 1.0, v15, v15, v5);
-
-    auto v11 = this->get_analyzer_info();
-    v13.y += 20;
-    auto *v6 = v11.c_str();
-    nglListAddString(nglSysFont(), (float)v13.x, (float)v13.y, 1.0, v15, v15, v6);
-}
-
-void game::frame_advance_level(Float time_inc)
-{
-    printf("game::frame_advance_level\n");
-
-    {
-        static int dword_14EEAC4 {-1};
-        mem_check_leaks_since_checkpoint(dword_14EEAC4, 1);
-        dword_14EEAC4 = mem_set_checkpoint();
-        mem_print_stats("\nMemory log\n");
-    }
-
-    void (__fastcall *func)(void *, void *edx, Float) = (decltype(func)) 0x0055D650;
-    func(this, nullptr, time_inc);
-}
-
-void render_text(const mString &a1, const vector2di &a2, color32 a3, float a4, float a5)
-{
-    if ( os_developer_options::instance()->get_flag(mString{"SHOW_DEBUG_TEXT"}) )
-    {
-        FEText fe_text{font_index{0},
-                       global_text_enum{0},
-                       (float) a2.x,
-                       (float) a2.y,
-                       (int) a4,
-                       panel_layer{0},
-                       a5,
-                       16,
-                       0,
-                       a3};
-
-        fe_text.field_1C = a1;
-
-        fe_text.Draw();
-    }
-}
-
-void game_patch() {
-    auto address = func_address(&game::frame_advance_level);
-    REDIRECT(0x0055D8C2, address);
-}

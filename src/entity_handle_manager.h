@@ -38,7 +38,7 @@ enum entity_flavor_t {
 
 namespace entity_handle_manager
 {
-    entity *find_entity(const string_hash &a1, entity_flavor_t a2, bool a3)
+    inline entity *find_entity(const string_hash &a1, entity_flavor_t a2, bool a3)
     {
         return (entity *) CDECL_CALL(0x004DC300, &a1, a2, a3);
     }

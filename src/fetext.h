@@ -4,6 +4,10 @@
 #include "func_wrapper.h"
 #include "color32.h"
 #include "common.h"
+#include "mstring.h"
+#include "os_developer_options.h"
+#include "trace.h"
+#include "vector2di.h"
 
 struct font_index
 {
@@ -57,9 +61,35 @@ struct FEText
 
     void Draw()
     {
+        TRACE("FEText::Draw");
+
         void (__fastcall *func)(void *) = bit_cast<decltype(func)>(0x00617640);
         func(this);
     }
 };
 
 VALIDATE_OFFSET(FEText, field_1C, 0x1C);
+
+inline void render_text(const mString &a1, const vector2di &a2, color32 a3, float a4, float a5)
+{
+    TRACE("render_text");
+
+    if ( os_developer_options::instance()->get_flag(mString{"SHOW_DEBUG_TEXT"}) )
+    {
+        FEText fe_text{font_index{0},
+                       global_text_enum{0},
+                       (float) a2.x,
+                       (float) a2.y,
+                       (int) a4,
+                       panel_layer{0},
+                       a5,
+                       16,
+                       0,
+                       a3};
+
+        fe_text.field_1C = a1;
+
+        fe_text.Draw();
+    }
+}
+

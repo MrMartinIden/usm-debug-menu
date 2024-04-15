@@ -1,6 +1,7 @@
 #pragma once
 
 #include "bit.h"
+#include "vector3d.h"
 
 struct po
 {

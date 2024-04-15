@@ -356,6 +356,8 @@ struct debug_menu_entry {
     debug_menu_entry(debug_menu *submenu);
 };
 
+extern debug_menu_entry *g_debug_camera_entry;
+
 typedef void (*menu_handler_function)(debug_menu_entry*, custom_key_type key_type);
 
 extern void close_debug();

@@ -1,9 +1,13 @@
 #pragma once
 
+#include "bit.h"
+#include "float.hpp"
 #include "variable.h"
 
 struct entity;
+struct mString;
 struct terrain;
+struct vector3d;
 
 struct world_dynamics_system
 {
@@ -18,14 +22,7 @@ struct world_dynamics_system
         return the_terrain;
     }
 
-    entity *get_hero_ptr(int index) {
-        constexpr auto MAX_GAME_PLAYERS = 1;
-
-        assert(index >= 0 && index <= MAX_GAME_PLAYERS);
-
-        auto *result = this->field_230[index];
-        return result;
-    }
+    entity *get_hero_ptr(int index);
 
     void remove_player(int player_num)
     {
@@ -47,9 +44,11 @@ struct world_dynamics_system
         return func(this, nullptr, &a2);
     }
 
+    void frame_advance(Float a2);
+
 };
 
-VALIDATE_OFFSET(world_dynamics_system, field_230, 0x230);
-
 inline Var<world_dynamics_system *> g_world_ptr{0x0095C770};
+
+extern void wds_patch();
 

@@ -18,6 +18,6 @@ struct vector4d {
 
 };
 
-float AbsSquared(const vector4d &a1) {
+inline float AbsSquared(const vector4d &a1) {
     return a1.length2();
 }

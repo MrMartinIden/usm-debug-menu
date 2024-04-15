@@ -28,7 +28,7 @@ const char *to_string(debug_menu_entry_type entry_type)
     return strings[entry_type];
 }
 
-struct debug_menu_entry;
+debug_menu_entry *g_debug_camera_entry {nullptr};
 
 void entry_frame_advance_callback_default(debug_menu_entry *a1) {}
 

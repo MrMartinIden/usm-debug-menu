@@ -4,7 +4,11 @@
 #include "func_wrapper.h"
 #include "mstring.h"
 
+#include <algorithm>
+#include <iterator>
 #include <optional>
+
+#include <windows.h>
 
 struct os_developer_options
 {
@@ -104,16 +108,25 @@ struct os_developer_options
 
     bool get_flag(const mString &a2)
     {
-        return this->m_flags[this->get_flag_from_name(a2)];
+        if constexpr (0)
+        {
+            return this->m_flags[this->get_flag_from_name(a2)];
+        }
+        else
+        {
+            bool (__fastcall *func)(void *, void *, const mString *)
+                = bit_cast<decltype(func)>(0x005C2F20);
+            return func(this, nullptr, &a2);
+        }
     }
 
     static inline Var<os_developer_options *> instance{0x0096858C};
 };
 
-Var<int[76]> int_defaults{0x00936A70};
+inline Var<int[76]> int_defaults{0x00936A70};
 
-Var<const char *[76]> int_names { 0x00936940 };
+inline Var<const char *[76]> int_names { 0x00936940 };
 
-Var<BOOL[150]> flag_defaults{0x00936678};
+inline Var<BOOL[150]> flag_defaults{0x00936678};
 
-Var<const char *[150]> flag_names { 0x00936420 };
+inline Var<const char *[150]> flag_names { 0x00936420 };

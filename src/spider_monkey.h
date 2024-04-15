@@ -2,37 +2,47 @@
 
 #include "func_wrapper.h"
 #include "game.h"
+#include "message_board.h"
 #include "os_developer_options.h"
 
-Var<bool> god_mode_cheat {0x0095A6A8};
-Var<bool> ultra_god_mode_cheat {0x0095A6A9};
-Var<bool> mega_god_mode_cheat {0x0095A6AA};
+inline Var<bool> god_mode_cheat {0x0095A6A8};
+inline Var<bool> ultra_god_mode_cheat {0x0095A6A9};
+inline Var<bool> mega_god_mode_cheat {0x0095A6AA};
 
 namespace spider_monkey
 {
-    void start()
+    inline void start()
     {
         CDECL_CALL(0x004B6690);
     }
 
-    void on_level_load()
+    inline bool is_running()
+    {
+        return (bool) CDECL_CALL(0x004B3B60);
+    }
+
+    inline void on_level_load()
     {
         CDECL_CALL(0x004B3910);
     }
 
-    void stop()
+    inline void stop()
     {
         CDECL_CALL(0x004B6700);
     }
 
-    void on_level_unload()
+    inline void on_level_unload()
     {
         CDECL_CALL(0x004B3B20);
     }
 
-    void render()
+    inline void render()
     {
         CDECL_CALL(0x004B6890);
+
+        {
+            g_game_ptr()->mb->render();
+        }
 
         {
             if ( os_developer_options::instance()->get_flag(mString{"SHOW_DEBUG_INFO"}) )
@@ -144,4 +154,12 @@ namespace spider_monkey
             }
         }
     }
+}
+
+inline void spider_monkey_patch()
+{
+    {
+        REDIRECT(0x0052B4BF, &spider_monkey::render);
+    }
+
 }

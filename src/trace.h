@@ -8,22 +8,20 @@ struct trace_obj
 {                                                                               
     std::string m_func_name;
     static inline int m_indent{0};
-    trace_obj(std::string func_name);
-                                                                                
-    ~trace_obj();
+
+    trace_obj(std::string func_name) : m_func_name(func_name)
+    {
+        std::cout << std::string(m_indent, '\t') << "--> " << m_func_name;
+        ++m_indent;
+    }
+
+    ~trace_obj()
+    {
+        --m_indent;
+        std::cout << std::string(m_indent, '\t') << "<-- " << m_func_name << '\n';
+    }
 };                                                                              
 
-trace_obj::trace_obj(std::string func_name) : m_func_name(func_name)
-{
-    std::cout << std::string(m_indent, '\t') << "--> " << m_func_name;
-    ++m_indent;
-}
-
-trace_obj::~trace_obj()
-{
-    --m_indent;
-    std::cout << std::string(m_indent, '\t') << "<-- " << m_func_name << '\n';
-}
 
 
 #if 1 
