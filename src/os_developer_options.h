@@ -1,14 +1,23 @@
 #pragma once
 
-#include "variable.h"
+#include "common.h"
 #include "func_wrapper.h"
 #include "mstring.h"
+#include "variable.h"
 
 #include <algorithm>
 #include <iterator>
 #include <optional>
 
 #include <windows.h>
+
+inline Var<int[76]> int_defaults{0x00936A70};
+
+inline Var<const char *[76]> int_names { 0x00936940 };
+
+inline Var<BOOL[150]> flag_defaults{0x00936678};
+
+inline Var<const char *[150]> flag_names { 0x00936420 };
 
 struct os_developer_options
 {
@@ -29,9 +38,11 @@ struct os_developer_options
         DEBUG_ENTITY_NAME = 13,
     };
 
+    int m_vtbl;
     bool m_flags[150];
     mString m_strings[14];
     int m_ints[76];
+    mString field_2AC;
 
     std::optional<mString> get_string(strings_t a2)
     {
@@ -58,10 +69,6 @@ struct os_developer_options
         this->m_flags[this->get_flag_from_name(a2)] = a3;
     }
 
-    static inline Var<const char *[76]> int_names { 0x00936940 };
-
-    static inline Var<int[76]> int_defaults{0x00936A70};
-
     int get_int_from_name(const mString &a1) {
 
         auto func = [&a1](auto &v2) {
@@ -83,19 +90,18 @@ struct os_developer_options
 
     static inline Var<BOOL[150]> flag_defaults{0x00936678};
 
-    int get_flag_from_name(const mString &a1) {
-        const char **v2 = flag_names();
-        do {
-            if (_strcmpi(*v2, a1.guts) == 0) {
-                break;
-            }
+    int get_flag_from_name(const mString &a1)
+    {
+        auto func = [&a1](const char *v2) {
+            return (_strcmpi(v2, a1.c_str()) == 0);
+        };
 
-            ++v2;
-        } while (v2 != (const char **) flag_defaults());
+        auto it = std::find_if(std::begin(flag_names()), std::end(flag_names()), func);
 
-        int v3 = v2 - flag_names();
-        if (v3 == 150) {
-            printf("Nonexistent option flag %s", a1.c_str());
+        size_t v3 = std::distance(std::begin(flag_names()), it);
+        if (v3 == std::size(flag_names())) {
+            mString out = "Nonexistent option flag " + a1;
+            printf("%s\n", out.c_str());
         }
 
         return v3;
@@ -108,7 +114,7 @@ struct os_developer_options
 
     bool get_flag(const mString &a2)
     {
-        if constexpr (0)
+        if constexpr (1)
         {
             return this->m_flags[this->get_flag_from_name(a2)];
         }
@@ -123,10 +129,5 @@ struct os_developer_options
     static inline Var<os_developer_options *> instance{0x0096858C};
 };
 
-inline Var<int[76]> int_defaults{0x00936A70};
+VALIDATE_SIZE(os_developer_options, 0x2BCu);
 
-inline Var<const char *[76]> int_names { 0x00936940 };
-
-inline Var<BOOL[150]> flag_defaults{0x00936678};
-
-inline Var<const char *[150]> flag_names { 0x00936420 };
