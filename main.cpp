@@ -21,22 +21,23 @@
 #include "base_ai_debug.h"
 #include "debug_menu_extra.h"
 #include "devopt.h"
+#include "debug_menu.h"
 #include "entity_animation_menu.h"
 #include "game.h"
 #include "input_mgr.h"
 #include "resource_manager.h"
 #include "forwards.h"
-#include "variable.h"
 #include "func_wrapper.h"
 #include "fixedstring32.h"
+#include "input_mgr.h"
 #include "levelmenu.h"
 #include "memory_menu.h"
 #include "message_board.h"
 #include "mission_manager.h"
 #include "mission_table_container.h"
+#include "mouselook_controller.h"
 #include "mstring.h"
 #include "region.h"
-#include "debug_menu.h"
 #include "os_developer_options.h"
 #include "script_executable.h"
 #include "script_library_class.h"
@@ -47,6 +48,7 @@
 #include "entity.h"
 #include "terrain.h"
 #include "vm_executable.h"
+#include "variable.h"
 #include "wds.h"
 
 DWORD* ai_current_player = nullptr;
@@ -1279,6 +1281,10 @@ void install_patches()
     }
 
     REDIRECT(0x005E10EE, init_shadow_targets);
+
+    input_mgr_patch();
+
+    mouselook_controller_patch();
 
     spider_monkey_patch();
 

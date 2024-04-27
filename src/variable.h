@@ -1,5 +1,7 @@
 #pragma once
 
+#include "bit.h"
+
 template<typename T>
 struct Var {
     using value_type = T;
@@ -12,7 +14,7 @@ struct Var {
     Var(Var &&) = delete;
     Var &operator=(Var &&) = delete;
 
-    Var(ptrdiff_t &&address) : pointer(reinterpret_cast<T *>(address)) {
+    Var(ptrdiff_t &&address) : pointer(bit_cast<T *>(address)) {
     }
 
     T *pointer;

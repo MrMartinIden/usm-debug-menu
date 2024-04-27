@@ -1039,6 +1039,10 @@ std::string camera_render_callback(debug_menu_entry *a2)
 
 void game_flags_handler(debug_menu_entry *a1)
 {
+    enum {
+        SLOW_MOTION = 2u,
+    };
+
     switch ( a1->get_id() )
     {
     case 0u: //Physics Enabled
@@ -1053,7 +1057,7 @@ void game_flags_handler(debug_menu_entry *a1)
         g_game_ptr()->flag.single_step = true;
         break;
     }
-    case 2u: //Slow Motion Enabled
+    case SLOW_MOTION: //Slow Motion Enabled
     {
         static int old_frame_lock = 0;
         int v27;
