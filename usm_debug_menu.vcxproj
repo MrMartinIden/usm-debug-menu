@@ -21,12 +21,17 @@
   <ItemGroup>
     <ClCompile Include="main.cpp" />
     <ClCompile Include="src\actor.cpp" />
+    <ClCompile Include="src\ai_player_controller.cpp" />
     <ClCompile Include="src\animation_controller.cpp" />
     <ClCompile Include="src\base_ai_debug.cpp" />
     <ClCompile Include="src\debug_menu.cpp" />
     <ClCompile Include="src\debug_menu_extra.cpp" />
     <ClCompile Include="src\game.cpp" />
+    <ClCompile Include="src\input_device.cpp" />
+    <ClCompile Include="src\input_mgr.cpp" />
+    <ClCompile Include="src\keyboard_device.cpp" />
     <ClCompile Include="src\message_board.cpp" />
+    <ClCompile Include="src\mouselook_controller.cpp" />
     <ClCompile Include="src\wds.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -41,6 +46,7 @@
     <ClInclude Include="src\common.h" />
     <ClInclude Include="src\debug_menu.h" />
     <ClInclude Include="src\debug_menu_extra.h" />
+    <ClInclude Include="src\device_id.h" />
     <ClInclude Include="src\devopt.h" />
     <ClInclude Include="src\entity.h" />
     <ClInclude Include="src\entity_animation_menu.h" />
@@ -62,7 +68,11 @@
     <ClInclude Include="src\hashstring.h" />
     <ClInclude Include="src\igofrontend.h" />
     <ClInclude Include="src\info_node.h" />
+    <ClInclude Include="src\input.h" />
+    <ClInclude Include="src\input_device.h" />
     <ClInclude Include="src\input_mgr.h" />
+    <ClInclude Include="src\keyboard.h" />
+    <ClInclude Include="src\keyboard_device.h" />
     <ClInclude Include="src\levelmenu.h" />
     <ClInclude Include="src\list.hpp" />
     <ClInclude Include="src\mashable_vector.h" />
@@ -73,6 +83,7 @@
     <ClInclude Include="src\mission_manager.h" />
     <ClInclude Include="src\mission_manager_script_data.h" />
     <ClInclude Include="src\mission_table_container.h" />
+    <ClInclude Include="src\mouselook_controller.h" />
     <ClInclude Include="src\mstring.h" />
     <ClInclude Include="src\mvector.h" />
     <ClInclude Include="src\nal_system.h" />
