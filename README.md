@@ -51,6 +51,23 @@ Access to in-game scripts that allow the player to tap into debug features
 
 Set your progress to any point in the game
 
+### Camera
+
+Allows to switch between 3 cameras: player chase camera, user camera and scene analyzer camera (the functionality of the last camera is still unknown).
+
+#### Usage of user camera
+
+* **T** - lock/unlock camera target to character 
+* **I** - move camera forward  
+* **K** - move camera backward
+* **O** - move camera up 
+* **U** - move camera down 
+* **J** - move camera left 
+* **L** - move camera right 
+* **Right Shift** - speed up the camera 
+* **Right Alt** - slow down camera 
+
+
 ## Extending functionality
 
 If you desire to add any new option(s) to the menu, it's very simple.
