@@ -32,6 +32,7 @@ jobs:
       run: |
           echo ${{github.workspace}}
           ls -lah ${{github.workspace}}
+          ls -lah ${{github.workspace}}/build
           mkdir ${{github.workspace}}/output
           cp ${{github.workspace}}/build/binkw32.dll ${{github.workspace}}/output/binkw32.dll
           cp ${{github.workspace}}/README.md  ${{github.workspace}}/output/.
