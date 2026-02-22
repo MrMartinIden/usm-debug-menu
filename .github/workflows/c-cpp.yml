@@ -17,12 +17,12 @@ jobs:
       uses: microsoft/setup-msbuild@v2
     - uses: actions/checkout@v4
     - name: Compile
-      run: msbuild /p:Platform=x86 /p:LanguageStandard="stdcpp20" /p:Configuration=Release
+      run: msbuild /p:Platform=x86 /p:LanguageStandard="stdcpp20" /p:Configuration=Debug
     - name: Prepare binaries
       shell: pwsh
       run: |
           mkdir output
-          cp Release\usm_debug_menu.dll output\binkw32.dll
+          cp Debug\usm_debug_menu.dll output\binkw32.dll
           cp README.md output\.
     - uses: actions/upload-artifact@v4
       with:
