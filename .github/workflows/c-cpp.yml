@@ -17,7 +17,7 @@ jobs:
       uses: microsoft/setup-msbuild@v2
     - uses: actions/checkout@v4
     - name: Compile
-      run: msbuild /p:Platform=x86 /p:Configuration=Release
+      run: msbuild /p:Platform=x86 /p:LanguageStandard="stdcpp20" /p:Configuration=Release
     - name: Prepare binaries
       shell: pwsh
       run: |
